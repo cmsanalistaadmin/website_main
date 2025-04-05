@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login CMS del Sur</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+  <!-- Modal de error -->
+  <div id="errorModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+      <h3 class="text-xl font-semibold text-red-600">Error</h3>
+      <p id="errorMessage" class="mt-2 text-gray-800">Hubo un problema con los datos. Por favor, inténtalo nuevamente.</p>
+      <div class="mt-4 text-right">
+        <button onclick="closeModal()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow-lg rounded-2xl w-full max-w-md p-8">
+    <!-- Logo -->
+    <div class="flex justify-center mb-6">
+      <img src="https://www.cmsdelsur.com/wp-content/uploads/2023/07/HORIZONTAL-BLUE@2x.png" alt="CMS del Sur Logo" class="w-52 object-contain">
+    </div>
+
+    <!-- Título -->
+    <h2 class="text-center text-2xl font-semibold text-gray-800 mb-6">Iniciar sesión</h2>
+
+    <!-- Formulario -->
+    <form method="POST" onsubmit="return validateForm(event)">
+      {% csrf_token %}
+
+      <!-- Email -->
+      <div class="mb-4">
+        <label for="email" class="block text-sm text-gray-600 mb-1">Correo electrónico</label>
+        <div class="flex items-center border rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
+          <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M16 12H8m8 0H8m8 0H8M4 6h16v12H4z" />
+          </svg>
+          <input type="email" id="email" name="email" required class="w-full focus:outline-none" placeholder="tucorreo@ejemplo.com">
+        </div>
+      </div>
+
+      <!-- Contraseña -->
+      <div class="mb-4">
+        <label for="password" class="block text-sm text-gray-600 mb-1">Contraseña</label>
+        <div class="flex items-center border rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
+          <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-5V9a6 6 0 00-12 0v3M4 12h16v8H4z" />
+          </svg>
+          <input type="password" id="password" name="password" required class="w-full focus:outline-none" placeholder="••••••••">
+        </div>
+      </div>
+
+      <!-- Recordarme + link olvidaste -->
+      <div class="flex justify-between items-center mb-6 text-sm text-gray-600">
+        <label class="flex items-center">
+          <input type="checkbox" name="remember" class="text-blue-600 mr-2">
+          Recuérdame
+        </label>
+      </div>
+
+      <!-- Botón -->
+      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition">
+        Iniciar sesión
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="my-6 flex items-center text-gray-400">
+      <hr class="flex-grow border-gray-300">
+      <span class="px-2 text-sm">o</span>
+      <hr class="flex-grow border-gray-300">
+    </div>
+
+    <!-- Registro -->
+    <p class="text-center text-sm text-gray-600">
+      ¿No tienes cuenta? o olvidaste tu Contraseña
+      <a href="#" class="text-blue-600 hover:underline font-semibold">Contactar con Soporte</a>
+    </p>
+
+  </div>
+
+  <script>
+    // Función para abrir el modal de error
+    function openModal(message) {
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorModal').classList.remove('hidden');
+    }
+
+    // Función para cerrar el modal
+    function closeModal() {
+      document.getElementById('errorModal').classList.add('hidden');
+    }
+
+    // Función para manejar el formulario
+    function validateForm(event) {
+      event.preventDefault(); // Evita que se envíe el formulario automáticamente
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (email === "" || password === "") {
+        openModal("Por favor, complete todos los campos.");
+        return false;
+      }
+
+      // Aquí puedes agregar más validaciones si lo necesitas
+
+      // Si todo está bien, el formulario se envía.
+      event.target.submit();
+    }
+
+    // Condicional para mostrar error de login desde el backend
+
+  </script>
+
+</body>
+</html>
