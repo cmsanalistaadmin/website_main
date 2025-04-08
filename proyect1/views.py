@@ -1,35 +1,29 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import User
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from django.shortcuts import render, redirect
 
 def login_view(request):
     if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
-        
-        # Autenticar usando el email como username
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        # Autentica usando el email (definido como USERNAME_FIELD)
         user = authenticate(request, username=email, password=password)
-
+        
         if user is not None:
             login(request, user)
-            
-            # Redirigir según el cargo
-            if user.profile.cargo == 'vendedor':
+            # Redirige según el cargo
+            if user.cargo == 'vendedor':
                 return redirect('vendedor_dashboard')
-            elif user.profile.cargo == 'supervisor':
+            elif user.cargo == 'supervisor':
                 return redirect('supervisor_dashboard')
-            elif user.profile.cargo == 'jefe':
+            elif user.cargo == 'jefe':
                 return redirect('jefe_dashboard')
         else:
-            messages.error(request, 'Usuario o contraseña incorrectos.')
-    
-    return render(request, 'duo/login.html')
+            messages.error(request, 'Correo o contraseña incorrectos.')
+            # La redirección se mantiene en el login para poder mostrar el error
 
+    return render(request, 'duo/login.html')
 
 @login_required
 def supervisor_dashboard(request):
@@ -42,3 +36,10 @@ def vendedor_dashboard(request):
 @login_required
 def jefe_dashboard(request):
     return render(request, 'jefe/maindas.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+def formeeff (request):
+    return render(request, 'vendedor/formEEFF.html')

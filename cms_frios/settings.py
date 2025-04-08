@@ -112,7 +112,9 @@ USE_I18N = True
 USE_TZ = True
 
 # settings.py
-LOGIN_URL = '/login/'  # Redirige a la vista de login si no está autenticado
+AUTH_USER_MODEL = 'proyect1.User'
+LOGIN_URL = '/login/'
+  # Redirige a la vista de login si no está autenticado
 
 
 # Static files (CSS, JavaScript, Images)

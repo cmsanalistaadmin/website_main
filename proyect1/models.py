@@ -1,66 +1,47 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
-# Crea un UserManager personalizado si deseas un control más detallado sobre la creación de usuarios
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, name, cargo, supervisor, codigo_ven, password):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError('El correo debe ser obligatorio')
-        user = self.model(
-            email=self.normalize_email(email),
-            password=password,
-            name=name,
-            cargo=cargo,
-            supervisor=supervisor,
-            codigo_ven=codigo_ven
-        )
-        user.set_password(password)
+            raise ValueError('El email es obligatorio')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)  # Aquí se encripta
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, name, cargo, supervisor, codigo_ven, password):
-        user = self.create_user(
-            email,
-            name=name,
-            cargo=cargo,
-            supervisor=supervisor,
-            codigo_ven=codigo_ven,
-            password=password
-        )
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
 
+CARGOS = (
+    ('vendedor', 'Vendedor'),
+    ('supervisor', 'Supervisor'),
+    ('jefe', 'Jefe'),
+)
 
-class User(models.Model):
-    # Campos de la base de datos
-    CORREO = models.EmailField(unique=True)
-    CONTRASEÑA = models.CharField(max_length=128)
-    CARGO_CHOICES = [
-        ('vendedor', 'Vendedor'),
-        ('supervisor', 'Supervisor'),
-        ('jefe', 'Jefe')
-    ]
-    CARGO = models.CharField(max_length=10, choices=CARGO_CHOICES)
-    
-    SUPERVISOR_CHOICES = [
-        ('Victor Murillo', 'Victor Murillo'),
-        ('Marcos Nuñez', 'Marcos Nuñez'),
-        ('Percy Apaza', 'Percy Apaza'),
-        ('Gonzalo Alvarado', 'Gonzalo Alvarado')
-    ]
-    SUPERVISOR = models.CharField(max_length=50, choices=SUPERVISOR_CHOICES)
+SUPERVISORES = (
+    ('Victor Murillo', 'Victor Murillo'),
+    ('Marcos Nuñez', 'Marcos Nuñez'),
+    ('Percy Apaza', 'Percy Apaza'),
+    ('Gonzalo Alvarado', 'Gonzalo Alvarado'),
+)
 
-    CODIGO_VEN = models.CharField(max_length=10, unique=True)
-    NOMBRE = models.CharField(max_length=255)
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)
+    cargo = models.CharField(max_length=20, choices=CARGOS)
+    codigo_vendedor = models.CharField(max_length=20, blank=True, null=True)
+    nombre = models.CharField(max_length=100)
+    supervisor = models.CharField(max_length=100, choices=SUPERVISORES, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
-    # Utiliza el CustomUserManager para manejar la creación de usuarios
     objects = CustomUserManager()
 
-    def __str__(self):
-        return self.NOMBRE
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['nombre']
 
-    class Meta:
-        verbose_name = "Usuario"
-        verbose_name_plural = "Usuarios"
+    def __str__(self):
+        return self.email
